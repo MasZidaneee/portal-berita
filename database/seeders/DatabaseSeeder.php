@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,15 +13,24 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Buat user contoh
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Tambahkan admin
+        DB::table('users')->insert([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        // Jalankan seeder untuk Post (berita)
-        $this->call([
-            PostSeeder::class,
+        // Tambahkan user biasa
+        DB::table('users')->insert([
+            'name' => 'User Biasa',
+            'email' => 'user@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

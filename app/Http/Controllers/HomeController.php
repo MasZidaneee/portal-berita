@@ -22,15 +22,17 @@ class HomeController extends Controller
         return view('post.show', compact('post'));
     }
 
-    // Fitur Pencarian Berita
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Ambil input pencarian dari form
-        $posts = Post::where('title', 'like', "%{$query}%") // Cari berdasarkan title
-                     ->orWhere('content', 'like', "%{$query}%") // Atau berdasarkan content
-                     ->get(); // Ambil hasil pencarian
+        $query = $request->input('q');
 
-        // Kembalikan view hasil pencarian
-        return view('search', compact('posts', 'query'));
+        $results = Berita::where('judul', 'like', '%' . $query . '%')
+                    ->orWhere('isi', 'like', '%' . $query . '%')
+                    ->get();
+
+        return view('search', [
+            'query' => $query,
+            'results' => $results
+        ]);
     }
 }

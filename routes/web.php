@@ -1,32 +1,38 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BeritaController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\BeritaController as AdminBeritaController;
 
-// 🏠 Halaman Home (ambil data dari controller)
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// 🔐 Auth Routes dari Breeze
+require __DIR__.'/auth.php';
 
-// 📄 Halaman Detail Berita
-Route::get('/berita/{id}', [HomeController::class, 'show'])->name('berita.show');
+// 🧾 Halaman Publik (detail berita & pencarian)
+Route::get('/berita/{id}', [BeritaController::class, 'show'])->name('berita.show');
+Route::get('/search', [BeritaController::class, 'search'])->name('search');
 
-// 🔍 Fitur Pencarian Berita
-Route::get('/search', [HomeController::class, 'search'])->name('search');
-
-// 🛡️ Halaman Dashboard (hanya untuk user yang sudah login & terverifikasi)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/politics', function () {
-    return view('politics');
+// 🧑‍💼 Admin CRUD Berita
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('beritas', AdminBeritaController::class);
 });
 
-// ⚙️ Halaman Pengaturan Profil (login required)
-Route::middleware('auth')->group(function () {
+// 👥 Route yang hanya bisa diakses setelah login
+Route::middleware(['auth'])->group(function () {
+    // 🏠 Beranda wajib login
+    Route::get('/', [BeritaController::class, 'index'])->name('home');
+
+    // 📚 Halaman kategori
+    Route::get('/healths', fn () => view('healths'));
+    Route::get('/worlds', fn () => view('worlds'));
+    Route::get('/education', fn () => view('education'));
+    Route::get('/sports', fn () => view('sports'));
+
+    // ⚙️ Profil pengguna
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
 
-// 🔐 Route untuk autentikasi login/register dari Breeze
-require __DIR__.'/auth.php';
+    // 🛡️ Dashboard (verifikasi email diperlukan)
+    Route::get('/dashboard', fn () => view('dashboard'))->middleware('verified')->name('dashboard');
+});

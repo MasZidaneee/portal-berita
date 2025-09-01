@@ -1,24 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="text-2xl font-bold mb-6">Hasil Pencarian: "{{ $query }}"</h1>
+<div class="max-w-5xl mx-auto py-8">
+    <h2 class="text-xl font-bold mb-4">Hasil Pencarian untuk: "{{ $query }}"</h2>
 
-    @if($posts->isEmpty())
-        <p class="text-gray-600">Tidak ada berita yang ditemukan.</p>
+    @if ($results->isEmpty())
+        <p class="text-gray-500">Tidak ditemukan berita yang cocok.</p>
     @else
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach ($posts as $post)
-                <div class="bg-white rounded shadow-md overflow-hidden">
-                    @if($post->image)
-                        <img src="{{ $post->image }}" alt="Gambar Berita" class="w-full h-48 object-cover">
-                    @endif
-                    <div class="p-4">
-                        <h2 class="text-xl font-semibold">{{ $post->title }}</h2>
-                        <p class="text-gray-600 text-sm mt-2">{{ Str::limit($post->content, 100) }}</p>
-                        <a href="{{ route('berita.show', $post->id) }}" class="text-blue-600 hover:underline mt-3 inline-block">Baca Selengkapnya</a>
-                    </div>
-                </div>
+        <ul class="space-y-4">
+            @foreach ($results as $berita)
+                <li class="border-b pb-3">
+                    <a href="{{ route('berita.show', $berita->id) }}" class="text-blue-600 font-semibold hover:underline">
+                        {{ $berita->judul }}
+                    </a>
+                    <p class="text-sm text-gray-600">{{ $berita->kategori }} | {{ $berita->created_at->format('d M Y') }}</p>
+                </li>
             @endforeach
-        </div>
+        </ul>
     @endif
+</div>
 @endsection
